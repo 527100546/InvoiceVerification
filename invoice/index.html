@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>请上传发票</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no">
+    <script src="../../assets/js/libs/jquery.js"></script>
+    <script src="../../assets/js/libs/require.js"></script>
+    <script src="../../assets/js/views/common.js"></script>
+</head>
+<body>
+<style>body {
+    text-align: center
+}
+
+.note {
+    text-align: center;
+    color: #888;
+    font-size: 20px;
+    margin-top: 60px
+}
+
+button {
+    background: #c9252c;
+    line-height: 1;
+    padding: 10px 0;
+    text-align: center;
+    width: 80%;
+    border: none;
+    color: #FFF;
+    border-radius: 6px;
+    font-size: 20px;
+    margin: 0 auto;
+    display: inline-block
+}</style>
+<p class="note"><img src="../../assets/images/order/check_1.png" alt=""><br><br>你好,请先扫描发票<br>点击下方按钮扫描发票</p><br><br>
+<button>打开微信扫一扫</button>
+<script>
+    var _url = encodeURIComponent(location.href);
+    var invoiceType = ""; // 01,04（01,04是普通发票，01,01是专用发票）,
+    var invoiceCode = ""; // 发票代码
+    var invoiceNum = ""; // 发票号码
+    var invoiceMoney = ""; // 不含税金额
+    var invoiceDate = ""; // 发票日期
+    var invoiceCheckCode = ""; // 校验码
+    var invoiceRadom = ""; // 随机产生的机密信息
+    let obj = {}
+    var _url = encodeURIComponent(location.href);
+    require(["https://res.wx.qq.com/open/js/jweixin-1.0.0.js", "https://wx.yikaiye.com/wx_jssdk.js?url=" + _url], function (e) {
+        window.wx = e, _config(jssdk_sign), e.ready(function () {
+            $("button").click(function () {
+                e.scanQRCode({
+                    needResult: 1, success: function (e) {
+                        let arr          = e.resultStr.split(",");
+                        obj.invoiceType      = arr[0] + arr[1];
+                        obj.invoiceCode = arr[2]; // 发票代码
+                        obj.invoiceNum       = arr[3];
+                        obj.invoiceMoney     = arr[4];
+                        obj.invoiceDate      = arr[5];
+                        obj.invoiceCheckCode = arr[6];
+                        obj.invoiceRadom     = arr[7];
+                        location.href = "http://wx.yikaiye.com/app/invoice/invoiceVerification.all.min.html?"+ $.param(obj)
+                    }
+                })
+            })
+        })
+    });
+    var _config = function (e) {
+        wx.config({
+            debug: !1,
+            appId: e.appId,
+            timestamp: e.timestamp,
+            nonceStr: e.nonceStr,
+            signature: e.signature,
+            jsApiList: ["scanQRCode", "checkJsApi", "onMenuShareTimeline", "onMenuShareAppMessage", "onMenuShareQQ", "onMenuShareWeibo", "onMenuShareQZone", "hideMenuItems", "showMenuItems", "hideAllNonBaseMenuItem", "showAllNonBaseMenuItem", "translateVoice", "startRecord", "stopRecord", "onVoiceRecordEnd", "playVoice", "onVoicePlayEnd", "pauseVoice", "stopVoice", "uploadVoice", "downloadVoice", "chooseImage", "previewImage", "uploadImage", "downloadImage", "getNetworkType", "openLocation", "getLocation", "hideOptionMenu", "showOptionMenu", "closeWindow"]
+        })
+    }</script>
+</body>
+</html>
